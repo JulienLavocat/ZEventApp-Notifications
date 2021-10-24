@@ -102,12 +102,7 @@ export class Subscriptions {
 			profileUrl: channels.get(e.broadcasterId)?.profile_image_url,
 		});
 	}
-	static onChannelUpdate(e: EventSubChannelUpdateEvent) {
-		console.log(`${e.broadcasterDisplayName} joue à ${e.categoryName} !`);
-		this.notifyGame(e);
-	}
-
-	static async notifyGame(e: EventSubChannelUpdateEvent) {
+	static async onChannelUpdate(e: EventSubChannelUpdateEvent) {
 		let broadcasterData = this.games.get(e.broadcasterName);
 		if (broadcasterData?.game !== e.categoryId) {
 			if (!broadcasterData) {

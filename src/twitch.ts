@@ -16,7 +16,10 @@ const apiClient = new ApiClient({
 const adapter =
 	process.env.NODE_ENV === "development"
 		? new NgrokAdapter()
-		: new ReverseProxyAdapter({ hostName: process.env.HELIX_HOST || "" });
+		: new ReverseProxyAdapter({
+				hostName: process.env.HELIX_HOST || "",
+				port: parseInt(process.env.port || "3444"),
+		  });
 
 const listener = new EventSubListener({
 	apiClient,

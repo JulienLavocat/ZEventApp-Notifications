@@ -1,0 +1,85 @@
+POST http://localhost:9200/games_autocomplete/_search
+content-type: application/json
+
+{
+	"query": {
+		"multi_match": {
+           "query": "Just",
+           "type": "bool_prefix",
+           "fields": [
+               "name",
+               "name._2gram",
+               "name._3gram"
+           ]
+       }
+	}
+}
+
+### Test api
+
+GET http://localhost:3000/items/resources/search?query=Green Wood
+
+### Posting data
+
+PUT http://localhost:9200/games_autocomplete_source/
+content-type: application/json
+
+{
+  "id": "21779",
+  "name": "League of Legends",
+  "boxArtUrl": "https://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-{width}x{height}.jpg"
+}
+
+### Bulk post data
+
+POST http://localhost:9200/games_autocomplete_source/_bulk
+content-type: application/json
+
+{"index": {}}
+{"id": "21779","name": "League of Legends","boxArtUrl": "https://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-{width}x{height}.jpg"}
+{"id": "21779","name": "League of Legends","boxArtUrl": "https://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-{width}x{height}.jpg"}
+\n
+
+
+### 1 - Creating source index
+
+PUT http://localhost:9200/games_autocomplete_source
+content-type: application/json
+
+{
+	"mappings": {
+		"properties": {
+			"name": {
+				"type": "search_as_you_type"
+			}
+		}
+	}
+}
+
+### 2 - Creating destination index
+
+PUT http://localhost:9200/games_autocomplete
+content-type: application/json
+
+{
+	"mappings": {
+		"properties": {
+			"name": {
+				"type": "search_as_you_type"
+			}
+		}
+	}
+}
+
+### 3 - Reindex source to destination
+POST http://localhost:9200/_reindex?pretty
+content-type: application/json
+
+{
+ "source": {
+   "index": "games_autocomplete_source"
+ },
+ "dest": {
+   "index": "games_autocomplete"
+ }
+}

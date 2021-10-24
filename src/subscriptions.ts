@@ -123,6 +123,7 @@ export class Subscriptions {
 					game: e.categoryId,
 				});
 			}
+
 			console.log(
 				"Notifying topics: ",
 				`game.${e.categoryId}`,

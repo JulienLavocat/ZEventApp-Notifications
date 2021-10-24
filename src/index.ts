@@ -1,44 +1,24 @@
 import { config } from "dotenv";
-import * as admin from "firebase-admin";
 config();
+import * as admin from "firebase-admin";
+import { collectGames } from "./gamesCollector";
+import * as twitch from "./twitch";
 
 admin.initializeApp({
 	credential: admin.credential.cert("./service-account.json"),
 	databaseURL: "https://zevent-33dd3.firebaseio.com",
 });
 
-import { Subscriptions } from "./subscriptions";
-import * as twitch from "./twitch";
-import { writeFileSync } from "fs";
-
 (async () => {
 	console.log("Deleting previous subscriptions...");
-	await twitch.apiClient.eventSub.deleteAllSubscriptions();
+	// await twitch.apiClient.eventSub.deleteAllSubscriptions();
 	console.log("Subscriptions successfuly deleted !");
 
-	// const paginator = await twitch.apiClient.games
-	// 	.getTopGamesPaginated()
-	// 	.getAll();
-	// writeFileSync(
-	// 	"src/data/games/all.json",
-	// 	JSON.stringify(paginator, null, 2),
-	// );
+	// await twitch.listener.listen();
 
-	// console.log(require("./data/games/all.json").length);
+	// await Subscriptions.subscribeToAll();
 
-	// let i = 0;
-	// while ((await paginator.getNext()).length > 0) {
-	// 	console.log((paginator.current as any[])[0]);
-	// 	writeFileSync(
-	// 		"src/data/games/page" + i + ".json",
-	// 		JSON.stringify(paginator.current, null, 2),
-	// 	);
-	// 	i++;
-	// }
-
-	await twitch.listener.listen();
-
-	await Subscriptions.subscribeToAll();
+	await collectGames();
 
 	console.log(
 		`Subscribed to ${

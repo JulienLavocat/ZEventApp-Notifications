@@ -4,7 +4,7 @@ content-type: application/json
 {
 	"query": {
 		"multi_match": {
-           "query": "Just",
+           "query": "chatting",
            "type": "bool_prefix",
            "fields": [
                "name",

@@ -4,7 +4,7 @@ import { HelixGameData } from "@twurple/api/lib/api/helix/game/HelixGame";
 const elasticIndex = "games_autocomplete";
 
 const elastic = new Client({
-	node: "http://localhost:9200",
+	node: process.env.ELASTIC_HOST,
 });
 
 export const ensureIndex = () =>

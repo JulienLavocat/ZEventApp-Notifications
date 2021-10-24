@@ -1,24 +1,25 @@
 import { config } from "dotenv";
-config();
 import * as admin from "firebase-admin";
-import { collectGames } from "./gamesCollector";
-import * as twitch from "./twitch";
-
+config();
 admin.initializeApp({
 	credential: admin.credential.cert("./service-account.json"),
 	databaseURL: "https://zevent-33dd3.firebaseio.com",
 });
+import { collectGames } from "./gamesCollector";
+import { Subscriptions } from "./subscriptions";
+import * as twitch from "./twitch";
 
 (async () => {
 	console.log("Deleting previous subscriptions...");
-	// await twitch.apiClient.eventSub.deleteAllSubscriptions();
+	await twitch.apiClient.eventSub.deleteAllSubscriptions();
 	console.log("Subscriptions successfuly deleted !");
 
-	// await twitch.listener.listen();
+	await twitch.listener.listen();
 
-	// await Subscriptions.subscribeToAll();
+	await Subscriptions.subscribeToAll();
 
-	await collectGames();
+	collectGames();
+	setInterval(() => collectGames(), 3600 * 1000);
 
 	console.log(
 		`Subscribed to ${

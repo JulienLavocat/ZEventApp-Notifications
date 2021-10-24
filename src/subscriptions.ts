@@ -124,12 +124,7 @@ export class Subscriptions {
 				});
 			}
 
-			console.log(
-				"Notifying topics: ",
-				`game.${e.categoryId}`,
-				`game.${e.broadcasterName}.${e.categoryId}`,
-				e.categoryName.replace(/[^a-zA-Z0-9]/g, "").toLowerCase(),
-			);
+			console.log(`${e.broadcasterName} joue à ${e.categoryName}`);
 
 			sendToTopics(["game", `game.${e.categoryId}`], {
 				titleFormat: `%s% joue à %g% !`,

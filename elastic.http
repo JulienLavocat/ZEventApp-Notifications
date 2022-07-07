@@ -1,4 +1,4 @@
-POST http://localhost:9200/games_autocomplete/_search
+POST https://51.159.184.27:9200/games_autocomplete/_search
 content-type: application/json
 
 {

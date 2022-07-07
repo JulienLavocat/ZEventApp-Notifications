@@ -9,6 +9,9 @@ const elastic = new Client({
 		username: process.env.ELASTIC_USERNAME || "",
 		password: process.env.ELASTIC_PASSWORD || "",
 	},
+	ssl: {
+		rejectUnauthorized: false,
+	},
 });
 
 export const ensureIndex = () =>

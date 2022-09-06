@@ -25,6 +25,7 @@ const listener = new EventSubListener({
 	apiClient,
 	adapter,
 	secret,
+	strictHostCheck: true,
 });
 
-export { apiClient, listener };
+export { listener, apiClient };

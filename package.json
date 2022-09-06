@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts",
+    "dev": "NODE_ENV=dev ts-node src/index.ts",
     "build": "tsc",
-    "prod": "node dist/index.js"
+    "prod": "NODE_ENV=prod node dist/index.js"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.15.0",

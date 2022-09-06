@@ -1,34 +1,12 @@
 import {
 	EventSubChannelUpdateEvent,
-	EventSubStreamOfflineEvent,
 	EventSubStreamOnlineEvent,
-	EventSubSubscription,
 } from "@twurple/eventsub/lib";
 import * as admin from "firebase-admin";
-import channelsRaw from "./data/channels.json";
-import channelsDevRaw from "./data/channels-dev.json";
-import * as twitch from "./twitch";
 import { NotificationMessagePayload } from "firebase-admin/lib/messaging/messaging-api";
-
-interface Channel {
-	id: string;
-	login: string;
-	display_name: string;
-	type: string;
-	broadcaster_type: string;
-	description: string;
-	profile_image_url: string;
-	offline_image_url: string;
-	view_count: number;
-	created_at: string;
-}
-
-const IS_DEV = process.env.NODE_ENV === "development";
-
-const channels: Map<string, Channel> = new Map();
-IS_DEV
-	? channelsDevRaw.forEach((e) => channels.set(e.id, e as Channel))
-	: channelsRaw.forEach((e) => channels.set(e.id, e));
+import { IS_DEV } from ".";
+import { Channels } from "./channels";
+import * as twitch from "./twitch";
 
 const messaging = admin.messaging();
 
@@ -43,6 +21,7 @@ function sendToTopics(
 		body?: string;
 	},
 ) {
+	console.log(`Sending to ${topics}:`, content);
 	return topics.map((e) => {
 		const notification: NotificationMessagePayload = {
 			title: content.titleFormat
@@ -66,31 +45,34 @@ export class Subscriptions {
 	static games: Map<string, { game: string; profileUrl: string }> = new Map();
 
 	static async subscribeToAll() {
-		const promises = Array.from(channels.values()).map(async (e) => {
-			await twitch.listener.subscribeToStreamOnlineEvents(e.id, (e) =>
-				this.onStreamOnline(e),
-			);
+		const promises = Array.from(Channels.getChannels().values()).map(
+			async (e) => {
+				await twitch.listener.subscribeToStreamOnlineEvents(e.id, (e) =>
+					this.onStreamOnline(e),
+				);
 
-			await twitch.listener.subscribeToChannelUpdateEvents(e.id, (e) =>
-				this.onChannelUpdate(e),
-			);
+				await twitch.listener.subscribeToChannelUpdateEvents(
+					e.id,
+					(e) => this.onChannelUpdate(e),
+				);
 
-			console.log("Subscribed to " + e.display_name);
-		});
+				console.log("Subscribed to " + e.displayName);
+			},
+		);
 
 		await Promise.all(promises);
 		console.log("Successfuly subscribed to all streamers");
 
-		if (IS_DEV) {
-			setInterval(() => {
-				sendToTopics(["online", "online.zerator"], {
-					titleFormat: "%s% à lancé son stream !",
-					displayName: "ZeratoR",
-					name: "zerator",
-					profileUrl: channels.get("41719107")?.profile_image_url,
-				});
-			}, 10000);
-		}
+		// if (IS_DEV) {
+		// 	setInterval(() => {
+		// 		sendToTopics(["dev", "dev.online.zerator"], {
+		// 			titleFormat: "%s% à lancé son stream !",
+		// 			displayName: "ZeratoR",
+		// 			name: "zerator",
+		// 			profileUrl: Channels.get("41719107")?.profilePictureUrl,
+		// 		});
+		// 	}, 10000);
+		// }
 	}
 
 	static onStreamOnline(e: EventSubStreamOnlineEvent) {
@@ -99,7 +81,7 @@ export class Subscriptions {
 			titleFormat: "%s% à lancé son stream !",
 			displayName: e.broadcasterDisplayName,
 			name: e.broadcasterName,
-			profileUrl: channels.get(e.broadcasterId)?.profile_image_url,
+			profileUrl: Channels.get(e.broadcasterId)?.profilePictureUrl,
 		});
 	}
 	static async onChannelUpdate(e: EventSubChannelUpdateEvent) {
@@ -125,7 +107,7 @@ export class Subscriptions {
 				titleFormat: `%s% joue à %g% !`,
 				displayName: e.broadcasterDisplayName,
 				name: e.broadcasterName,
-				profileUrl: channels.get(e.broadcasterId)?.profile_image_url,
+				profileUrl: Channels.get(e.broadcasterId)?.profilePictureUrl,
 				body: `${e.streamTitle}`,
 				game: e.categoryName,
 			});

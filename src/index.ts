@@ -5,21 +5,24 @@ admin.initializeApp({
 	credential: admin.credential.cert("./service-account.json"),
 	databaseURL: "https://zevent-33dd3.firebaseio.com",
 });
-import { collectGames } from "./gamesCollector";
 import { Subscriptions } from "./subscriptions";
 import * as twitch from "./twitch";
+import { Channels } from "./channels";
+
+export const IS_DEV = process.env.NODE_ENV !== "prod";
 
 (async () => {
 	console.log("Deleting previous subscriptions...");
 	await twitch.apiClient.eventSub.deleteAllSubscriptions();
 	console.log("Subscriptions successfuly deleted !");
 
+	await Channels.load();
+
+	console.log("Streamers list loaded");
+
 	await twitch.listener.listen();
 
 	await Subscriptions.subscribeToAll();
-
-	collectGames();
-	setInterval(() => collectGames(), 3600 * 1000);
 
 	console.log(
 		`Subscribed to ${

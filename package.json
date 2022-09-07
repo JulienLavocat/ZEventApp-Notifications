@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=dev ts-node src/index.ts",
+    "dev": "NODE_ENV=dev tsnd src/index.ts",
     "build": "tsc",
     "prod": "NODE_ENV=prod node dist/index.js"
   },

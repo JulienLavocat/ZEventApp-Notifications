@@ -14,7 +14,7 @@ const apiClient = new ApiClient({
 });
 
 const adapter =
-	process.env.NODE_ENV === "development"
+	process.env.NODE_ENV !== "prod"
 		? new NgrokAdapter()
 		: new ReverseProxyAdapter({
 				hostName: process.env.HELIX_HOST || "",
